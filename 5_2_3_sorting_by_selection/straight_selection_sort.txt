@@ -1,0 +1,9 @@
+for I := 1 to N
+   min = I ;
+   for J := I+1 to N  
+     if data[J] < data[min] then
+       min := J
+     end if
+   end for
+   swap (data[I], data[min])
+ end for

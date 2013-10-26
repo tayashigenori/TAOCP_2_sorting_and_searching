@@ -1,0 +1,17 @@
+# Sort an array a[0...n-1].
+gaps = [701, 301, 132, 57, 23, 10, 4, 1]
+
+foreach (gap in gaps)
+{
+    # Do an insertion sort for each gap size.
+    for (i = gap; i < n; i += 1)
+    {
+        temp = a[i]
+        for (j = i; j >= gap and a[j - gap] > temp; j -= gap)
+        {
+            a[j] = a[j - gap]
+        }
+        a[j] = temp
+    }
+
+}

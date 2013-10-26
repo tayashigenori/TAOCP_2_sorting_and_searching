@@ -1,0 +1,138 @@
+// Top-down implementation
+TopDownMergeSort(A[], B[], n)
+{
+    TopDownSplitMerge(A, 0, n, B);
+}
+ 
+TopDownSplitMerge(A[], iBegin, iEnd, B[])
+{
+    if(iEnd - iBegin < 2)                       // if run size == 1
+        return;                                 //   consider it sorted
+    // recursively split runs into two halves until run size == 1,
+    // then merge them and return back up the call chain
+    iMiddle = (iEnd + iBegin) / 2;              // iMiddle = mid point
+    TopDownSplitMerge(A, iBegin,  iMiddle, B);  // split / merge left  half
+    TopDownSplitMerge(A, iMiddle, iEnd,    B);  // split / merge right half
+    TopDownMerge(A, iBegin, iMiddle, iEnd, B);  // merge the two half runs
+    CopyArray(B, iBegin, iEnd, A);              // copy the merged runs back to A
+}
+ 
+TopDownMerge(A[], iBegin, iMiddle, iEnd, B[])
+{
+    i0 = iBegin, i1 = iMiddle;
+ 
+    // While there are elements in the left or right runs
+    for (j = iBegin; j < iEnd; j++) {
+        // If left run head exists and is <= existing right run head.
+        if (i0 < iMiddle && (i1 >= iEnd || A[i0] <= A[i1]))
+            B[j] = A[i0++];  // Increment i0 after using it as an index.
+        else
+            B[j] = A[i1++];  // Increment i1 after using it as an index.
+    }
+}
+
+// Bottom-up implementation
+/* array A[] has the items to sort; array B[] is a work array */
+BottomUpSort(int n, int A[], int B[])
+{
+  int width;
+ 
+  /* Each 1-element run in A is already "sorted". */
+ 
+  /* Make successively longer sorted runs of length 2, 4, 8, 16... until whole array is sorted. */
+  for (width = 1; width < n; width = 2 * width)
+    {
+      int i;
+ 
+      /* Array A is full of runs of length width. */
+      for (i = 0; i < n; i = i + 2 * width)
+        {
+          /* Merge two runs: A[i:i+width-1] and A[i+width:i+2*width-1] to B[] */
+          /* or copy A[i:n-1] to B[] ( if(i+width >= n) ) */
+          BottomUpMerge(A, i, min(i+width, n), min(i+2*width, n), B);
+        }
+ 
+      /* Now work array B is full of runs of length 2*width. */
+      /* Copy array B to array A for next iteration. */
+      /* A more efficient implementation would swap the roles of A and B */
+      CopyArray(A, B, n);
+      /* Now array A is full of runs of length 2*width. */
+    }
+}
+ 
+BottomUpMerge(int A[], int iLeft, int iRight, int iEnd, int B[])
+{
+  int i0 = iLeft;
+  int i1 = iRight;
+  int j;
+ 
+  /* While there are elements in the left or right lists */
+  for (j = iLeft; j < iEnd; j++)
+    {
+      /* If left list head exists and is <= existing right list head */
+      if (i0 < iRight && (i1 >= iEnd || A[i0] <= A[i1]))
+        {
+          B[j] = A[i0];
+          i0 = i0 + 1;
+        }
+      else
+        {
+          B[j] = A[i1];
+          i1 = i1 + 1;
+        }
+    }
+}
+
+// Top-down implementation using lists
+function merge_sort(list m)
+    // if list size is 0 (empty) or 1, consider it sorted and return it
+    // (using less than or equal prevents infinite recursion for a zero length m)
+    if length(m) <= 1
+        return m
+    // else list size is > 1, so split the list into two sublists
+    // 1. DIVIDE Part...
+    var list left, right
+    var integer middle = length(m) / 2
+    for each x in m before middle
+         add x to left
+    for each x in m after or equal middle
+         add x to right
+    // recursively call merge_sort() to further split each sublist
+    // until sublist size is 1
+    left = merge_sort(left)
+    right = merge_sort(right)
+    // merge the sublists returned from prior calls to merge_sort()
+    // and return the resulting merged sublist
+    // 2. CONQUER Part...
+    return merge(left, right)
+
+function merge(left, right)
+    // receive the left and right sublist as arguments.
+    // 'result' variable for the merged result of two sublists.
+    var list result
+    // assign the element of the sublists to 'result' variable until there is no element to merge. 
+    while length(left) > 0 or length(right) > 0
+        if length(left) > 0 and length(right) > 0
+           // compare the first two element, which is the small one, of each two sublists.
+            if first(left) <= first(right)
+                // the small element is copied to 'result' variable.
+                // delete the copied one(a first element) in the sublist.
+                append first(left) to result
+                left = rest(left)
+            else
+                // same operation as the above(in the right sublist).
+                append first(right) to result
+                right = rest(right)
+        else if length(left) > 0
+            // copy all of remaining elements from the sublist to 'result' variable, 
+            // when there is no more element to compare with.
+            append first(left) to result
+            left = rest(left)
+        else if length(right) > 0
+            // same operation as the above(in the right sublist).
+            append first(right) to result
+            right = rest(right)
+    end while
+    // return the result of the merged sublists(or completed one, finally).
+    // the length of the left and right sublists will grow bigger and bigger, after the next call of this function.
+    return result
